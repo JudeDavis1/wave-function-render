@@ -12,27 +12,31 @@ z_set = []
 
 PLANKS_CONSTANT = 6.626 * 10**-34
 H_BAR = PLANKS_CONSTANT / (2 * np.pi)
-DELTA = 0.07
+DELTA = 0.02
 
 def animate(frame_i):
     """Animation function"""
 
     x = DELTA * frame_i
-    y = wave_func(x, t=time.time(), n_=x / 2)
+    y = DELTA * frame_i
+    z = wave_func((x, y), t=time.time(), n_=3)
 
     x_set.append(x)
     y_set.append(y)
+    z_set.append(z)
 
     ax.clear()
-    ax.scatter(x_set, y_set, x_set, s=4)
+    ax.plot3D(x_set, y_set, z_set)
 
-def wave_func(x, t, a=4, n_=5, m=1.00784):
+def wave_func(coords, t, a=4, n_=5, m=1.00784):
     """Wave function by solving Schrodinger's equation"""
 
+    x, y = coords
     eN = get_energy(n_, m, a)
     norm_term = np.sqrt(2 / a)
     time_dependence = np.exp(-1j * eN * t / H_BAR)
-    ret = norm_term * np.sin(n_ * np.pi * x / a) * time_dependence
+    arg = lambda coord: n_ * np.pi * coord / a
+    ret = norm_term * np.sin(arg(x)) * np.sin(arg(y)) * time_dependence
 
     return ret
 
@@ -47,6 +51,5 @@ anim = animation.FuncAnimation(
     animate,
     interval=0,
     frames=int(1e6),
-
 )
 plt.show()
